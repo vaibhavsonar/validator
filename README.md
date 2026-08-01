@@ -10,7 +10,7 @@ A lightweight, fluent validation framework for Java that supports:
 - ✔ Custom validation rules
 - ✔ Rule identifiers
 - ✔ Zero reflection during validation
-- ✔ Java 17+
+- ✔ Java 21+
 
 ---
 
@@ -394,7 +394,7 @@ Unlike Bean Validation (JSR-380), this library focuses on:
 
 # Requirements
 
-- Java 17 or later
+- Java 21 or later
 
 ---
 
