@@ -1,7 +1,7 @@
-# validator
+# validator [![Build](https://github.com/vaibhavsonar/validator/actions/workflows/build.yml/badge.svg)](https://github.com/vaibhavsonar/validator/actions/workflows/build.yml)
 Generic validator for your POJOs.
 
-[![Build](https://github.com/vaibhavsonar/validator/actions/workflows/build.yml/badge.svg)](https://github.com/vaibhavsonar/validator/actions/workflows/build.yml)
+
 
 A lightweight, fluent validation framework for Java that supports:
 
