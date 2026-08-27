@@ -24,7 +24,7 @@ import java.util.function.Predicate;
  * passes the rule and no validation error is produced.
  *
  * <p>The resulting {@link Error} identifies the validation target as
- * {@code "this"}, because the rule applies to the complete item rather than
+ * {@code fieldName}, because the rule applies to the complete item rather than
  * to a specific field. The rejected value is the item that failed
  * validation.
  *
@@ -46,6 +46,14 @@ public class ItemValidationRuleImpl<T> implements ItemValidationRule<T> {
      * other validation rules.
      */
     private final RuleIdentifier ruleIdentifier;
+
+    /**
+     * Name of the field being validated.
+     * <p>
+     * This value identifies the validation target and is included in the
+     * {@link Error} produced when the rule fails.
+     */
+    private final String fieldName;
 
     /**
      * Predicate used to validate the complete item.
@@ -102,7 +110,7 @@ public class ItemValidationRuleImpl<T> implements ItemValidationRule<T> {
         log.info("Validating rule [{}] for index [{}]", ruleIdentifier, index);
         if (predicate.test(objectToValidate)) {
             Error error = new Error()
-                    .setField("this")
+                    .setField(fieldName)
                     .setRejectedValue(objectToValidate)
                     .setMessage(message);
             log.info("During validation of rule [{}] for index [{}], an error found [{}]",

@@ -20,6 +20,7 @@ class ItemRuleBuilderTest {
         List<ItemValidationRule<Employee>> rules = builder
                 .check(
                         TestRuleId.EMPLOYEE_REQUIRED,
+                        "employee",
                         employee -> employee == null,
                         "Employee must not be null"
                 )
@@ -43,6 +44,7 @@ class ItemRuleBuilderTest {
         List<ItemValidationRule<Employee>> rules = builder
                 .check(
                         TestRuleId.EMPLOYEE_ADULT,
+                        "age",
                         employee -> employee.getAge() < 18,
                         "Employee must be at least 18 years old"
                 )
@@ -76,16 +78,19 @@ class ItemRuleBuilderTest {
         List<ItemValidationRule<Employee>> rules = builder
                 .check(
                         TestRuleId.EMPLOYEE_REQUIRED,
+                        "employee",
                         employee -> employee == null,
                         "Employee must not be null"
                 )
                 .check(
                         TestRuleId.EMPLOYEE_ADULT,
+                        "age",
                         employee -> employee.getAge() < 18,
                         "Employee must be at least 18 years old"
                 )
                 .check(
                         TestRuleId.EMPLOYEE_ACTIVE,
+                        "active",
                         employee -> !Boolean.TRUE.equals(employee.getActive()),
                         "Employee must be active"
                 )
@@ -115,6 +120,7 @@ class ItemRuleBuilderTest {
 
         ItemRuleBuilder<Employee> result = builder.check(
                 TestRuleId.EMPLOYEE_REQUIRED,
+                "employee",
                 employee -> employee == null,
                 "Employee must not be null"
         );
@@ -138,6 +144,7 @@ class ItemRuleBuilderTest {
 
         builder.check(
                 TestRuleId.EMPLOYEE_REQUIRED,
+                "employee",
                 employee -> employee == null,
                 "Employee must not be null"
         );
@@ -158,6 +165,7 @@ class ItemRuleBuilderTest {
         List<ItemValidationRule<Address>> rules = builder
                 .check(
                         TestRuleId.ADDRESS_REQUIRED,
+                        "address",
                         address -> address == null,
                         "Address must not be null"
                 )

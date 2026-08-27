@@ -23,7 +23,7 @@ import java.util.function.Predicate;
  * {@code false}, the item passes that rule.
  *
  * <p>Multiple independent item-level rules can be configured using successive
- * calls to {@link #check(RuleIdentifier, Predicate, String)}. The rules are
+ * calls to {@link #check(RuleIdentifier, String, Predicate, String)}. The rules are
  * retained in registration order and returned by {@link #build()}.
  *
  * <p>The builder can be created either directly using its public constructor
@@ -66,7 +66,7 @@ public class ItemRuleBuilder<T> {
      * Creates a new, empty {@code ItemRuleBuilder}.
      * <p>
      * The returned builder contains no validation rules. Rules can be added
-     * using {@link #check(RuleIdentifier, Predicate, String)}.
+     * using {@link #check(RuleIdentifier, String, Predicate, String)}.
      *
      * @param <T> the type of item to be validated
      * @return a new, empty {@code ItemRuleBuilder}
@@ -84,16 +84,19 @@ public class ItemRuleBuilder<T> {
      * validation message is reported.
      *
      * @param ruleIdentifier the identifier of the validation rule
+     * @param fieldName the field name for which the rule is being applied
      * @param predicate      the predicate used to determine whether the item
      *                       violates the validation rule
      * @param message        the validation message reported when the rule fails
      * @return this builder for method chaining
      */
     public ItemRuleBuilder<T> check(RuleIdentifier ruleIdentifier,
+                                    String fieldName,
                                     Predicate<T> predicate,
                                     String message) {
         rules.add(new ItemValidationRuleImpl<>(
                 ruleIdentifier,
+                fieldName,
                 predicate,
                 message
         ));

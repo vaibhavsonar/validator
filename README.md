@@ -342,6 +342,7 @@ ItemRuleBuilder<Employee> employeeRules =
 
 employeeRules.check(
         ValidationRules.EMPLOYEE_INVALID,
+        "id-address",
         employee -> employee.getId() == null
                 || employee.getId().isBlank()
                 || employee.getAddress() == null,
@@ -388,6 +389,7 @@ ItemRuleBuilder<Employee> employeeRules =
 
 employeeRules.check(
         ValidationRules.EMPLOYEE_INVALID,
+        "id",
         employee -> employee.getId() == null
                 || employee.getId().isBlank(),
         "Employee ID is required"

@@ -40,6 +40,7 @@ class ItemValidatorImplTest {
                 new ItemValidatorImpl<>(
                         List.of(new ItemValidationRuleImpl<>(
                                 TestRule.ID_REQUIRED,
+                                "employee",
                                 employee -> false,
                                 "Employee is invalid"
                         ))
@@ -64,6 +65,7 @@ class ItemValidatorImplTest {
                 new ItemValidatorImpl<>(
                         List.of(new ItemValidationRuleImpl<>(
                                 TestRule.ID_REQUIRED,
+                                "employee",
                                 employee -> true,
                                 "Employee is invalid"
                         ))
@@ -86,7 +88,7 @@ class ItemValidatorImplTest {
 
         Error error = errors.get(0);
 
-        assertEquals("this", error.getField());
+        assertEquals("employee", error.getField());
         assertSame(employee, error.getRejectedValue());
         assertEquals("Employee is invalid", error.getMessage());
     }
@@ -97,11 +99,13 @@ class ItemValidatorImplTest {
                 new ItemValidatorImpl<>(
                         List.of(new ItemValidationRuleImpl<>(
                                         TestRule.ID_REQUIRED,
+                                        "age",
                                         employee -> employee.getAge() < 18,
                                         "Employee must be at least 18"
                                 ),
                                 new ItemValidationRuleImpl<>(
                                         TestRule.ID_INVALID,
+                                        "active",
                                         employee -> !Boolean.TRUE.equals(employee.getActive()),
                                         "Employee must be active"
                                 ))
@@ -143,11 +147,13 @@ class ItemValidatorImplTest {
                 new ItemValidatorImpl<>(
                         List.of(new ItemValidationRuleImpl<>(
                                         TestRule.ID_REQUIRED,
+                                        "employee",
                                         employee -> false,
                                         "This error should not be returned"
                                 ),
                                 new ItemValidationRuleImpl<>(
                                         TestRule.ID_INVALID,
+                                        "employee",
                                         employee -> true,
                                         "Employee is invalid"
                                 ))
@@ -174,6 +180,7 @@ class ItemValidatorImplTest {
                 new ItemValidatorImpl<>(
                         List.of(new ItemValidationRuleImpl<>(
                                         TestRule.ID_REQUIRED,
+                                        "id",
                                         employee -> {
                                             executionCount.incrementAndGet();
                                             return false;
@@ -182,6 +189,7 @@ class ItemValidatorImplTest {
                                 ),
                                 new ItemValidationRuleImpl<>(
                                         TestRule.ID_INVALID,
+                                        "id",
                                         employee -> {
                                             executionCount.incrementAndGet();
                                             return false;
@@ -190,6 +198,7 @@ class ItemValidatorImplTest {
                                 ),
                                 new ItemValidationRuleImpl<>(
                                         TestRule.AGE_INVALID,
+                                        "age",
                                         employee -> {
                                             executionCount.incrementAndGet();
                                             return false;
@@ -210,6 +219,7 @@ class ItemValidatorImplTest {
                 new ItemValidatorImpl<>(
                         List.of(new ItemValidationRuleImpl<>(
                                         TestRule.ID_REQUIRED,
+                                        "id",
                                         employee -> {
                                             executionOrder.add(1);
                                             return false;
@@ -218,6 +228,7 @@ class ItemValidatorImplTest {
                                 ),
                                 new ItemValidationRuleImpl<>(
                                         TestRule.ID_INVALID,
+                                        "id",
                                         employee -> {
                                             executionOrder.add(2);
                                             return false;
@@ -226,6 +237,7 @@ class ItemValidatorImplTest {
                                 ),
                                 new ItemValidationRuleImpl<>(
                                         TestRule.AGE_INVALID,
+                                        "age",
                                         employee -> {
                                             executionOrder.add(3);
                                             return false;
@@ -246,6 +258,7 @@ class ItemValidatorImplTest {
         ItemValidationRule<Employee> rule =
                 new ItemValidationRuleImpl<>(
                         TestRule.ID_REQUIRED,
+                        "employee",
                         employee -> true,
                         "Employee is invalid"
                 );
@@ -267,6 +280,7 @@ class ItemValidatorImplTest {
         ItemValidationRule<Employee> rule =
                 new ItemValidationRuleImpl<>(
                         TestRule.ID_REQUIRED,
+                        "employee",
                         employee -> false,
                         "No error"
                 );
@@ -288,6 +302,7 @@ class ItemValidatorImplTest {
         ItemValidationRule<Employee> rule =
                 new ItemValidationRuleImpl<>(
                         TestRule.ID_REQUIRED,
+                        "employee",
                         employee -> true,
                         "Employee is invalid"
                 );
@@ -324,6 +339,7 @@ class ItemValidatorImplTest {
         ItemValidationRule<Employee> rule =
                 new ItemValidationRuleImpl<>(
                         TestRule.ID_REQUIRED,
+                        "employee",
                         value -> {
                             invocationCount.incrementAndGet();
 
@@ -360,6 +376,7 @@ class ItemValidatorImplTest {
         ItemValidationRule<Employee> rule =
                 new ItemValidationRuleImpl<>(
                         TestRule.ID_REQUIRED,
+                        "employee",
                         employee -> employee == null,
                         "Employee is required"
                 );
@@ -379,7 +396,7 @@ class ItemValidatorImplTest {
                 .get(0);
 
         assertEquals("Employee is required", error.getMessage());
-        assertEquals("this", error.getField());
+        assertEquals("employee", error.getField());
         assertNull(error.getRejectedValue());
     }
 
@@ -400,6 +417,7 @@ class ItemValidatorImplTest {
                 new ItemValidatorImpl<>(
                         List.of(new ItemValidationRuleImpl<>(
                                 TestRule.ID_INVALID,
+                                "address",
                                 value -> value.getAddress() == null
                                         || value.getAddress().getCity() == null
                                         || value.getAddress().getCity().isBlank(),
@@ -416,7 +434,7 @@ class ItemValidatorImplTest {
                 .get(INDEX)
                 .get(0);
 
-        assertEquals("this", error.getField());
+        assertEquals("address", error.getField());
         assertSame(employee, error.getRejectedValue());
         assertEquals(
                 "Employee address city is required",
@@ -430,16 +448,19 @@ class ItemValidatorImplTest {
                 new ItemValidatorImpl<>(
                         List.of(new ItemValidationRuleImpl<>(
                                         TestRule.ID_REQUIRED,
+                                        "id",
                                         employee -> true,
                                         "First error"
                                 ),
                                 new ItemValidationRuleImpl<>(
                                         TestRule.ID_INVALID,
+                                        "id",
                                         employee -> true,
                                         "Second error"
                                 ),
                                 new ItemValidationRuleImpl<>(
                                         TestRule.AGE_INVALID,
+                                        "age",
                                         employee -> true,
                                         "Third error"
                                 ))
