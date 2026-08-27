@@ -15,7 +15,7 @@ class FieldRuleBuilderTest {
     @Test
     void check_shouldAddSingleRule() {
 
-        FieldRuleBuilder<Employee, String> builder = new FieldRuleBuilder<>();
+        FieldRuleBuilder<Employee, String> builder = FieldRuleBuilder.newInstance();
 
         builder.check(
                 TestRule.ID_REQUIRED,
@@ -40,7 +40,7 @@ class FieldRuleBuilderTest {
     @Test
     void check_shouldSupportMultipleRules() {
 
-        FieldRuleBuilder<Employee, String> builder = new FieldRuleBuilder<>();
+        FieldRuleBuilder<Employee, String> builder = FieldRuleBuilder.newInstance();
 
         builder.check(
                 TestRule.ID_REQUIRED,
@@ -67,7 +67,7 @@ class FieldRuleBuilderTest {
     @Test
     void check_shouldReturnSameBuilderForMethodChaining() {
 
-        FieldRuleBuilder<Employee, String> builder = new FieldRuleBuilder<>();
+        FieldRuleBuilder<Employee, String> builder = FieldRuleBuilder.newInstance();
 
         FieldRuleBuilder<Employee, String> returned = builder.check(
                 TestRule.ID_REQUIRED,
