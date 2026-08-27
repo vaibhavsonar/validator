@@ -18,6 +18,7 @@ class ItemValidationRuleImplTest {
         ItemValidationRuleImpl<Employee> rule =
                 new ItemValidationRuleImpl<>(
                         TestRuleId.EMPLOYEE_AGE,
+                        "age",
                         employee -> employee.getAge() < 18,
                         "Employee must be at least 18 years old"
                 );
@@ -36,6 +37,7 @@ class ItemValidationRuleImplTest {
         ItemValidationRuleImpl<Employee> rule =
                 new ItemValidationRuleImpl<>(
                         TestRuleId.EMPLOYEE_AGE,
+                        "age",
                         value -> value.getAge() < 18,
                         "Employee must be at least 18 years old"
                 );
@@ -46,7 +48,7 @@ class ItemValidationRuleImplTest {
 
         Error error = result.get();
 
-        assertEquals("this", error.getField());
+        assertEquals("age", error.getField());
         assertSame(employee, error.getRejectedValue());
         assertEquals(
                 "Employee must be at least 18 years old",
@@ -65,6 +67,7 @@ class ItemValidationRuleImplTest {
         ItemValidationRuleImpl<Employee> rule =
                 new ItemValidationRuleImpl<>(
                         TestRuleId.EMPLOYEE_AGE,
+                        "age",
                         value -> value.getAge() < 18,
                         "Employee must be at least 18 years old"
                 );
@@ -92,6 +95,7 @@ class ItemValidationRuleImplTest {
         ItemValidationRuleImpl<Employee> rule =
                 new ItemValidationRuleImpl<>(
                         TestRuleId.EMPLOYEE_AGE,
+                        "age",
                         value -> value.getAge() < 18,
                         "Employee must be an adult"
                 );
@@ -113,6 +117,7 @@ class ItemValidationRuleImplTest {
         ItemValidationRuleImpl<Employee> rule =
                 new ItemValidationRuleImpl<>(
                         TestRuleId.EMPLOYEE_REQUIRED,
+                        "name-age",
                         value -> value.getName() == null
                                 || value.getName().isBlank()
                                 || value.getAge() < 18,
@@ -122,7 +127,7 @@ class ItemValidationRuleImplTest {
         Optional<Error> result = rule.validate(null, employee, 0);
 
         assertTrue(result.isPresent());
-        assertEquals("this", result.get().getField());
+        assertEquals("name-age", result.get().getField());
         assertSame(employee, result.get().getRejectedValue());
         assertEquals("Employee data is invalid", result.get().getMessage());
     }
@@ -138,6 +143,7 @@ class ItemValidationRuleImplTest {
         ItemValidationRuleImpl<Employee> rule =
                 new ItemValidationRuleImpl<>(
                         TestRuleId.EMPLOYEE_ACTIVE,
+                        "active",
                         value -> !Boolean.TRUE.equals(value.getActive()),
                         "Employee must be active"
                 );
@@ -166,6 +172,7 @@ class ItemValidationRuleImplTest {
         ItemValidationRuleImpl<Employee> rule =
                 new ItemValidationRuleImpl<>(
                         TestRuleId.EMPLOYEE_REQUIRED,
+                        "employee",
                         value -> value.getAddress() == null
                                 || value.getAddress().getCity() == null
                                 || value.getAddress().getCity().isBlank(),
@@ -178,7 +185,7 @@ class ItemValidationRuleImplTest {
 
         Error error = result.get();
 
-        assertEquals("this", error.getField());
+        assertEquals("employee", error.getField());
         assertSame(employee, error.getRejectedValue());
         assertEquals(
                 "Employee address city must not be empty",
@@ -197,6 +204,7 @@ class ItemValidationRuleImplTest {
         ItemValidationRuleImpl<Address> rule =
                 new ItemValidationRuleImpl<>(
                         TestRuleId.ADDRESS_REQUIRED,
+                        "city",
                         value -> value.getCity() == null
                                 || value.getCity().isBlank(),
                         "Address city must not be empty"
@@ -208,7 +216,7 @@ class ItemValidationRuleImplTest {
 
         Error error = result.get();
 
-        assertEquals("this", error.getField());
+        assertEquals("city", error.getField());
         assertSame(address, error.getRejectedValue());
         assertEquals(
                 "Address city must not be empty",
@@ -221,6 +229,7 @@ class ItemValidationRuleImplTest {
         ItemValidationRuleImpl<Employee> rule =
                 new ItemValidationRuleImpl<>(
                         TestRuleId.EMPLOYEE_AGE,
+                        "age",
                         employee -> employee.getAge() < 18,
                         "Employee must be an adult"
                 );
@@ -244,6 +253,7 @@ class ItemValidationRuleImplTest {
         ItemValidationRuleImpl<Employee> rule =
                 new ItemValidationRuleImpl<>(
                         TestRuleId.EMPLOYEE_AGE,
+                        "age",
                         predicate,
                         "Employee must be an adult"
                 );
@@ -257,6 +267,7 @@ class ItemValidationRuleImplTest {
         ItemValidationRuleImpl<Employee> rule =
                 new ItemValidationRuleImpl<>(
                         TestRuleId.EMPLOYEE_AGE,
+                        "age",
                         employee -> employee.getAge() < 18,
                         "Employee must be an adult"
                 );
