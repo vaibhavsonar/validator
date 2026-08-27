@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class ItemRuleBuilderTest {
     @Test
     void shouldBuildItemValidationRule() {
-        ItemRuleBuilder<Employee> builder = new ItemRuleBuilder<>();
+        ItemRuleBuilder<Employee> builder = ItemRuleBuilder.newInstance();
 
         List<ItemValidationRule<Employee>> rules = builder
                 .check(
@@ -38,7 +38,7 @@ class ItemRuleBuilderTest {
 
     @Test
     void shouldConfigurePredicateAndMessage() {
-        ItemRuleBuilder<Employee> builder = new ItemRuleBuilder<>();
+        ItemRuleBuilder<Employee> builder = ItemRuleBuilder.newInstance();
 
         List<ItemValidationRule<Employee>> rules = builder
                 .check(
@@ -71,7 +71,7 @@ class ItemRuleBuilderTest {
 
     @Test
     void shouldAddMultipleRules() {
-        ItemRuleBuilder<Employee> builder = new ItemRuleBuilder<>();
+        ItemRuleBuilder<Employee> builder = ItemRuleBuilder.newInstance();
 
         List<ItemValidationRule<Employee>> rules = builder
                 .check(
@@ -111,7 +111,7 @@ class ItemRuleBuilderTest {
 
     @Test
     void shouldReturnSameBuilderFromCheck() {
-        ItemRuleBuilder<Employee> builder = new ItemRuleBuilder<>();
+        ItemRuleBuilder<Employee> builder = ItemRuleBuilder.newInstance();
 
         ItemRuleBuilder<Employee> result = builder.check(
                 TestRuleId.EMPLOYEE_REQUIRED,
@@ -124,7 +124,7 @@ class ItemRuleBuilderTest {
 
     @Test
     void shouldReturnEmptyListWhenNoRulesAreConfigured() {
-        ItemRuleBuilder<Employee> builder = new ItemRuleBuilder<>();
+        ItemRuleBuilder<Employee> builder = ItemRuleBuilder.newInstance();
 
         List<ItemValidationRule<Employee>> rules = builder.build();
 
@@ -134,7 +134,7 @@ class ItemRuleBuilderTest {
 
     @Test
     void shouldReturnCopyFromBuild() {
-        ItemRuleBuilder<Employee> builder = new ItemRuleBuilder<>();
+        ItemRuleBuilder<Employee> builder = ItemRuleBuilder.newInstance();
 
         builder.check(
                 TestRuleId.EMPLOYEE_REQUIRED,
@@ -153,7 +153,7 @@ class ItemRuleBuilderTest {
 
     @Test
     void shouldSupportDifferentItemTypes() {
-        ItemRuleBuilder<Address> builder = new ItemRuleBuilder<>();
+        ItemRuleBuilder<Address> builder = ItemRuleBuilder.newInstance();
 
         List<ItemValidationRule<Address>> rules = builder
                 .check(

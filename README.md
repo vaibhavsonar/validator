@@ -338,7 +338,7 @@ Suppose an employee must have both an ID and an address:
 
 ```java
 ItemRuleBuilder<Employee> employeeRules =
-        new ItemRuleBuilder<>();
+        ItemRuleBuilder.newInstance();
 
 employeeRules.check(
         ValidationRules.EMPLOYEE_INVALID,
@@ -384,7 +384,7 @@ An item validator can also contain item-level rules:
 
 ```java
 ItemRuleBuilder<Employee> employeeRules =
-        new ItemRuleBuilder<>();
+        ItemRuleBuilder.newInstance();
 
 employeeRules.check(
         ValidationRules.EMPLOYEE_INVALID,

@@ -26,9 +26,13 @@ import java.util.function.Predicate;
  * calls to {@link #check(RuleIdentifier, Predicate, String)}. The rules are
  * retained in registration order and returned by {@link #build()}.
  *
+ * <p>The builder can be created either directly using its public constructor
+ * or through the {@link #newInstance()} factory method.
+ *
  * <p>Example:
  * <pre>{@code
- * ItemRuleBuilder<Person> rules = new ItemRuleBuilder<>();
+ * ItemRuleBuilder<Person> rules =
+ *         ItemRuleBuilder.newInstance();
  *
  * rules
  *     .check(
@@ -41,6 +45,8 @@ import java.util.function.Predicate;
  *         person -> person.getName() == null && person.getAge() == null,
  *         "Name and age cannot both be null"
  *     );
+ *
+ * List<ItemValidationRule<Person>> validationRules = rules.build();
  * }</pre>
  *
  * @param <T> the type of item being validated
@@ -55,6 +61,19 @@ public class ItemRuleBuilder<T> {
      * in that same order by {@link #build()}.
      */
     private final List<ItemValidationRule<T>> rules = new ArrayList<>();
+
+    /**
+     * Creates a new, empty {@code ItemRuleBuilder}.
+     * <p>
+     * The returned builder contains no validation rules. Rules can be added
+     * using {@link #check(RuleIdentifier, Predicate, String)}.
+     *
+     * @param <T> the type of item to be validated
+     * @return a new, empty {@code ItemRuleBuilder}
+     */
+    public static <T> ItemRuleBuilder<T> newInstance() {
+        return new ItemRuleBuilder<>();
+    }
 
     /**
      * Adds an item-level validation rule.
