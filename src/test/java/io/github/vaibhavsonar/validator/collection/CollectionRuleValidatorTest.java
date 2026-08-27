@@ -10,6 +10,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CollectionRuleValidatorTest {
+    private static final int INDEX = 0;
+
     @Test
     void validate_whenRulePasses_shouldReturnSuccessfulValidation() {
 
@@ -20,7 +22,7 @@ class CollectionRuleValidatorTest {
                         "Validation failed");
 
         CollectionValidationResult result =
-                validator.validate(List.of(new Employee()));
+                validator.validate(List.of(new Employee()), INDEX);
 
         assertTrue(result.isValidationSuccessful());
         assertTrue(result.errors().isEmpty());
@@ -36,7 +38,7 @@ class CollectionRuleValidatorTest {
                         "Duplicate employee id");
 
         CollectionValidationResult result =
-                validator.validate(List.of(new Employee()));
+                validator.validate(List.of(new Employee()), INDEX);
 
         assertFalse(result.isValidationSuccessful());
 
@@ -48,7 +50,7 @@ class CollectionRuleValidatorTest {
     }
 
     @Test
-    void validate_shouldAssociateErrorWithRowZero() {
+    void validate_shouldAssociateErrorWithIndexZero() {
 
         CollectionRuleValidator<Employee> validator =
                 new CollectionRuleValidator<>(
@@ -57,7 +59,7 @@ class CollectionRuleValidatorTest {
                         "Validation failed");
 
         CollectionValidationResult result =
-                validator.validate(List.of(new Employee()));
+                validator.validate(List.of(new Employee()), INDEX);
 
         assertTrue(result.errors().containsKey(0));
         assertEquals(1, result.errors().size());
@@ -76,7 +78,7 @@ class CollectionRuleValidatorTest {
                         list -> list.size() == 2,
                         "Expected size");
 
-        CollectionValidationResult result = validator.validate(employees);
+        CollectionValidationResult result = validator.validate(employees, INDEX);
 
         assertFalse(result.isValidationSuccessful());
         assertEquals(1, result.errors().get(0).size());

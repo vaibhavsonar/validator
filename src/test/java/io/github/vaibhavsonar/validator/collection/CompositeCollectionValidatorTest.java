@@ -5,13 +5,18 @@ import io.github.vaibhavsonar.validator.helper.TestRule;
 import io.github.vaibhavsonar.validator.helper.model.Employee;
 import io.github.vaibhavsonar.validator.model.Error;
 import io.github.vaibhavsonar.validator.result.CollectionValidationResult;
+import io.github.vaibhavsonar.validator.rule.builder.CollectionRuleBuilder;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class CompositeCollectionValidatorTest {
+    private static final int INDEX = 0;
+
     @Test
     void validate_whenNoRules_shouldReturnSuccessfulValidation() {
 
@@ -19,7 +24,7 @@ class CompositeCollectionValidatorTest {
                 new CompositeCollectionValidator<>();
 
         CollectionValidationResult result =
-                validator.validate(List.of(new Employee()));
+                validator.validate(List.of(new Employee()), INDEX);
 
         assertTrue(result.isValidationSuccessful());
         assertTrue(result.errors().isEmpty());
@@ -32,19 +37,15 @@ class CompositeCollectionValidatorTest {
                 new CompositeCollectionValidator<>();
 
         validator.addRule(
-                TestRule.DUPLICATE_ID,
-                employees -> {
-                    CollectionValidationResult result = new CollectionValidationResult();
-                    result.addError(
-                            new Error()
-                                    .setField("employees")
-                                    .setMessage("Duplicate employee id"),
-                            0);
-                    return result;
-                });
+                CollectionValidatorBuilder.<Employee>newInstance()
+                        .collection(
+                                duplicateIdRule()
+                        )
+                        .build());
 
         CollectionValidationResult result =
-                validator.validate(List.of(new Employee()));
+                validator.validate(List.of(new Employee().setId("123"),
+                        new Employee().setId("123")), INDEX);
 
         assertFalse(result.isValidationSuccessful());
 
@@ -66,21 +67,17 @@ class CompositeCollectionValidatorTest {
                 new CompositeCollectionValidator<>();
 
         second.addRule(
-                TestRule.DUPLICATE_ID,
-                employees -> {
-                    CollectionValidationResult result = new CollectionValidationResult();
-                    result.addError(
-                            new Error()
-                                    .setField("employees")
-                                    .setMessage("Duplicate employee id"),
-                            0);
-                    return result;
-                });
+                CollectionValidatorBuilder.<Employee>newInstance()
+                        .collection(
+                                duplicateIdRule()
+                        )
+                        .build());
 
         first.addRules(second);
 
         CollectionValidationResult result =
-                first.validate(List.of(new Employee()));
+                first.validate(List.of(new Employee().setId("123"),
+                        new Employee().setId("123")), INDEX);
 
         assertFalse(result.isValidationSuccessful());
         assertEquals(1, result.errors().get(0).size());
@@ -93,34 +90,29 @@ class CompositeCollectionValidatorTest {
                 new CompositeCollectionValidator<>();
 
         validator.addRule(
-                TestRule.DUPLICATE_ID,
-                employees -> {
-                    CollectionValidationResult result = new CollectionValidationResult();
-                    result.addError(
-                            new Error()
-                                    .setField("employees")
-                                    .setMessage("Duplicate employee id"),
-                            0);
-                    return result;
-                });
+                CollectionValidatorBuilder.<Employee>newInstance()
+                        .collection(
+                                duplicateIdRule()
+                        )
+                        .build());
 
         validator.addRule(
-                TestRule.COLLECTION_EMPTY,
-                employees -> {
-                    CollectionValidationResult result = new CollectionValidationResult();
-                    result.addError(
-                            new Error()
-                                    .setField("employees")
-                                    .setMessage("Collection is empty"),
-                            0);
-                    return result;
-                });
+                CollectionValidatorBuilder.<Employee>newInstance()
+                        .collection(
+                                CollectionRuleBuilder.<Employee>newInstance()
+                                        .check(
+                                                "employees",
+                                                TestRule.COLLECTION_EMPTY,
+                                                employees -> employees.isEmpty(),
+                                                "Collection is empty")
+                        )
+                        .build());
 
         CollectionValidationResult result =
-                validator.validate(List.of(new Employee()));
+                validator.validate(List.of(), INDEX);
 
         assertFalse(result.isValidationSuccessful());
-        assertEquals(2, result.errors().get(0).size());
+        assertEquals(1, result.errors().get(0).size());
     }
 
     @Test
@@ -131,16 +123,29 @@ class CompositeCollectionValidatorTest {
         CompositeCollectionValidator<Employee> validator =
                 new CompositeCollectionValidator<>();
 
-        CollectionValidator<Employee> countingValidator = employees -> {
+        CollectionValidator<Employee> countingValidator = (employees, index) -> {
             counter[0]++;
             return new CollectionValidationResult();
         };
 
-        validator.addRule(TestRule.DUPLICATE_ID, countingValidator);
-        validator.addRule(TestRule.COLLECTION_EMPTY, countingValidator);
+        validator.addRule(countingValidator);
+        validator.addRule(countingValidator);
 
-        validator.validate(List.of(new Employee()));
+        validator.validate(List.of(new Employee()), INDEX);
 
         assertEquals(2, counter[0]);
+    }
+
+    private CollectionRuleBuilder<Employee> duplicateIdRule() {
+        return CollectionRuleBuilder.<Employee>newInstance()
+                .check(
+                        "employees",
+                        TestRule.DUPLICATE_ID,
+                        employees -> !employees.stream()
+                                .collect(Collectors.groupingBy(Employee::getId))
+                                .values().stream()
+                                .filter(group -> group.size() > 1)
+                                .flatMap(Collection::stream).toList().isEmpty(),
+                        "Duplicate employee id");
     }
 }

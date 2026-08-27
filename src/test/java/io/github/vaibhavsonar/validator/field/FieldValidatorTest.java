@@ -4,15 +4,13 @@ import io.github.vaibhavsonar.validator.helper.TestRule;
 import io.github.vaibhavsonar.validator.helper.model.Employee;
 import io.github.vaibhavsonar.validator.model.Error;
 import io.github.vaibhavsonar.validator.result.ItemValidationResult;
-import io.github.vaibhavsonar.validator.rule.ValidationRule;
+import io.github.vaibhavsonar.validator.rule.builder.FieldRuleBuilder;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class FieldValidatorTest {
-    private static final int ROW = 1;
+    private static final int INDEX = 1;
 
     @Test
     void validate_validValue_shouldReturnNoErrors() {
@@ -22,15 +20,17 @@ class FieldValidatorTest {
 
         FieldValidator<Employee, String> validator =
                 new FieldValidator<>(
-                        "id",
-                        Employee::getId,
-                        List.of(
-                                new ValidationRule<>(
+                        FieldRuleBuilder.<Employee, String>newInstance()
+                                .check(
                                         TestRule.ID_REQUIRED,
+                                        "id",
+                                        Employee::getId,
                                         String::isBlank,
-                                        "Id is required")));
+                                        "Id is required")
+                                .build()
+                );
 
-        ItemValidationResult result = validator.validate(employee, ROW);
+        ItemValidationResult result = validator.validate(employee, INDEX);
 
         assertTrue(result.isValidationSuccessful());
         assertTrue(result.errors().isEmpty());
@@ -43,19 +43,21 @@ class FieldValidatorTest {
 
         FieldValidator<Employee, String> validator =
                 new FieldValidator<>(
-                        "id",
-                        Employee::getId,
-                        List.of(
-                                new ValidationRule<>(
+                        FieldRuleBuilder.<Employee, String>newInstance()
+                                .check(
                                         TestRule.ID_REQUIRED,
+                                        "id",
+                                        Employee::getId,
                                         value -> value == null,
-                                        "Id is required")));
+                                        "Id is required")
+                                .build()
+                );
 
-        ItemValidationResult result = validator.validate(employee, ROW);
+        ItemValidationResult result = validator.validate(employee, INDEX);
 
         assertFalse(result.isValidationSuccessful());
 
-        Error error = result.errors().get(ROW).get(0);
+        Error error = result.errors().get(INDEX).get(0);
 
         assertEquals("id", error.getField());
         assertNull(error.getRejectedValue());
@@ -70,19 +72,21 @@ class FieldValidatorTest {
 
         FieldValidator<Employee, String> validator =
                 new FieldValidator<>(
-                        "id",
-                        Employee::getId,
-                        List.of(
-                                new ValidationRule<>(
+                        FieldRuleBuilder.<Employee, String>newInstance()
+                                .check(
                                         TestRule.ID_INVALID,
+                                        "id",
+                                        Employee::getId,
                                         id -> id.length() < 6,
-                                        "Invalid Id")));
+                                        "Invalid Id")
+                                .build()
+                );
 
-        ItemValidationResult result = validator.validate(employee, ROW);
+        ItemValidationResult result = validator.validate(employee, INDEX);
 
         assertFalse(result.isValidationSuccessful());
 
-        Error error = result.errors().get(ROW).get(0);
+        Error error = result.errors().get(INDEX).get(0);
 
         assertEquals("id", error.getField());
         assertEquals("ABC", error.getRejectedValue());
@@ -97,22 +101,27 @@ class FieldValidatorTest {
 
         FieldValidator<Employee, String> validator =
                 new FieldValidator<>(
-                        "id",
-                        Employee::getId,
-                        List.of(
-                                new ValidationRule<>(
+                        FieldRuleBuilder.<Employee, String>newInstance()
+                                .check(
                                         TestRule.ID_REQUIRED,
+                                        "id",
+                                        Employee::getId,
                                         String::isBlank,
-                                        "Id is required"),
-                                new ValidationRule<>(
-                                        TestRule.ID_INVALID,
-                                        id -> id.length() < 5,
-                                        "Invalid Id")));
 
-        ItemValidationResult result = validator.validate(employee, ROW);
+                                        "Id is required")
+                                .check(
+                                        TestRule.ID_INVALID,
+                                        "id",
+                                        Employee::getId,
+                                        id -> id.length() < 5,
+                                        "Invalid Id")
+                                .build()
+                );
+
+        ItemValidationResult result = validator.validate(employee, INDEX);
 
         assertFalse(result.isValidationSuccessful());
-        assertEquals(2, result.errors().get(ROW).size());
+        assertEquals(2, result.errors().get(INDEX).size());
     }
 
     @Test
@@ -123,23 +132,27 @@ class FieldValidatorTest {
 
         FieldValidator<Employee, String> validator =
                 new FieldValidator<>(
-                        "id",
-                        Employee::getId,
-                        List.of(
-                                new ValidationRule<>(
+                        FieldRuleBuilder.<Employee, String>newInstance()
+                                .check(
                                         TestRule.ID_REQUIRED,
+                                        "id",
+                                        Employee::getId,
                                         String::isBlank,
-                                        "Id is required"),
-                                new ValidationRule<>(
+                                        "Id is required")
+                                .check(
                                         TestRule.ID_INVALID,
+                                        "id",
+                                        Employee::getId,
                                         id -> id.length() < 5,
-                                        "Invalid Id")));
+                                        "Invalid Id")
+                                .build()
+                );
 
-        ItemValidationResult result = validator.validate(employee, ROW);
+        ItemValidationResult result = validator.validate(employee, INDEX);
 
-        assertEquals(1, result.errors().get(ROW).size());
+        assertEquals(1, result.errors().get(INDEX).size());
 
-        Error error = result.errors().get(ROW).get(0);
+        Error error = result.errors().get(INDEX).get(0);
 
         assertEquals("Invalid Id", error.getMessage());
     }
@@ -152,35 +165,37 @@ class FieldValidatorTest {
 
         FieldValidator<Employee, String> validator =
                 new FieldValidator<>(
-                        "id",
-                        Employee::getId,
-                        List.of());
+                        FieldRuleBuilder.<Employee, String>newInstance()
+                                .build()
+                );
 
-        ItemValidationResult result = validator.validate(employee, ROW);
+        ItemValidationResult result = validator.validate(employee, INDEX);
 
         assertTrue(result.isValidationSuccessful());
     }
 
     @Test
-    void validate_shouldAssociateErrorsWithSuppliedRowNumber() {
+    void validate_shouldAssociateErrorsWithSuppliedIndex() {
 
-        int rowNumber = 25;
+        int index = 25;
 
         Employee employee = new Employee();
 
         FieldValidator<Employee, String> validator =
                 new FieldValidator<>(
-                        "id",
-                        Employee::getId,
-                        List.of(
-                                new ValidationRule<>(
+                        FieldRuleBuilder.<Employee, String>newInstance()
+                                .check(
                                         TestRule.ID_REQUIRED,
+                                        "id",
+                                        Employee::getId,
                                         value -> value == null,
-                                        "Id is required")));
+                                        "Id is required")
+                                .build()
+                );
 
-        ItemValidationResult result = validator.validate(employee, rowNumber);
+        ItemValidationResult result = validator.validate(employee, index);
 
-        assertTrue(result.errors().containsKey(rowNumber));
+        assertTrue(result.errors().containsKey(index));
         assertFalse(result.errors().containsKey(1));
     }
 

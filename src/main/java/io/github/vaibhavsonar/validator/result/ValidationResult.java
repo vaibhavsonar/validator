@@ -9,56 +9,58 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Represents the outcome of a validation operation.
+ * Defines the contract for the result of a validation operation.
  * <p>
- * A {@code ValidationResult} maintains validation errors grouped by row number
- * and exposes utility methods for adding, merging, and querying validation
- * results.
+ * A {@code ValidationResult} maintains validation errors grouped by an
+ * integer index and provides operations for adding, merging, and querying
+ * those errors.
  *
- * <p>The validation type indicates whether the result contains errors,
- * warnings, or other supported validation outcomes.
+ * <p>The {@link ValidationType} identifies the validation scope represented
+ * by the result, such as collection-level or item-level validation.
  *
- * <p>Implementations are expected to provide the underlying error storage
- * through {@link #errors()} and the associated {@link ValidationType}.
+ * <p>Implementations provide the underlying error storage through
+ * {@link #errors()} and specify their validation scope through
+ * {@link #validationType()}.
  *
  * @author Vaibhav Sonar
  */
 public interface ValidationResult {
 
     /**
-     * Returns the validation errors grouped by row number.
+     * Returns the validation errors grouped by their associated index.
      * <p>
-     * For collection or tabular validation, the map key represents the
-     * zero-based or one-based row number (depending on the validator
-     * implementation) associated with the validation errors.
+     * The meaning of the index depends on the validation operation. For
+     * item-level validation, it typically identifies the item or row being
+     * validated. For collection-level validation, it identifies the index
+     * associated with the collection validation result according to the
+     * validator implementation.
      *
-     * <p>
-     * For single-object validation, all validation errors are stored under
-     * index.
+     * <p>The returned map contains one entry for each index for which one or
+     * more validation errors have been recorded.
      *
-     * For collection validation, all validation errors are stored under
-     * row number {@code 0}.
-     *
-     * @return a map containing validation errors grouped by row number;
-     *         row {@code 0} represents object-level validation
+     * @return a map containing validation errors grouped by index
      */
     Map<Integer, List<Error>> errors();
 
     /**
-     * Returns the type of validation represented by this result.
+     * Returns the validation scope represented by this result.
      *
-     * @return the validation type
+     * @return the {@link ValidationType} associated with this validation result
      */
     ValidationType validationType();
 
     /**
-     * Adds a validation error for the specified row.
+     * Adds a validation error for the specified index.
+     * <p>
+     * If errors already exist for the supplied index, the new error is
+     * appended to the existing list. Otherwise, a new error list is created
+     * for the index.
      *
      * @param error the validation error to add
-     * @param rowNumber the row number associated with the error
+     * @param index the index associated with the validation error
      */
-    default void addError(Error error, int rowNumber) {
-        errors().compute(rowNumber, (k, v) -> {
+    default void addError(Error error, int index) {
+        errors().compute(index, (k, v) -> {
             if (Objects.isNull(v)) {
                 v = new ArrayList<>();
             }
@@ -68,34 +70,41 @@ public interface ValidationResult {
     }
 
     /**
-     * Adds multiple validation errors for the specified row.
+     * Adds multiple validation errors for the specified index.
+     * <p>
+     * Each supplied error is added using {@link #addError(Error, int)}.
      *
      * @param errors the validation errors to add
-     * @param rowNumber the row number associated with the errors
+     * @param index  the index associated with the validation errors
      */
-    default void addErrors(List<Error> errors, int rowNumber) {
-        errors.forEach(error -> addError(error, rowNumber));
+    default void addErrors(List<Error> errors, int index) {
+        errors.forEach(error -> addError(error, index));
     }
 
     /**
-     * Determines whether the validation completed successfully without
-     * producing any validation errors.
+     * Determines whether the validation result contains no validation errors.
      *
      * @return {@code true} if no validation errors are present;
-     *         {@code false} otherwise
+     * {@code false} otherwise
      */
     default boolean isValidationSuccessful() {
         return errors().isEmpty();
     }
 
     /**
-     * Merges validation errors from another validation result into this one.
+     * Merges validation errors from another validation result into this
+     * result.
+     * <p>
+     * Errors are merged using their existing indexes. Existing errors in this
+     * result are retained, and errors from the supplied result are appended
+     * to the corresponding index.
      *
-     * @param other the validation result whose errors are to be merged
+     * @param other the validation result whose errors should be merged into
+     *              this result
      */
     default void addErrorsFrom(ValidationResult other) {
-        other.errors().forEach((row, errors) -> {
-            addErrors(errors, row);
+        other.errors().forEach((index, errors) -> {
+            addErrors(errors, index);
         });
     }
 }

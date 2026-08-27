@@ -1,5 +1,6 @@
 package io.github.vaibhavsonar.validator.integration;
 
+import io.github.vaibhavsonar.validator.ItemValidator;
 import io.github.vaibhavsonar.validator.helper.EmployeeValidator;
 import io.github.vaibhavsonar.validator.helper.model.Address;
 import io.github.vaibhavsonar.validator.helper.model.Employee;
@@ -41,8 +42,9 @@ public class ItemValidationIntegrationTest {
                                 .setCity("")
                                 .setCountry("Invalid"));
 
+        ItemValidator<Employee> employeeItemValidator = EmployeeValidator.employeeValidator();
         ItemValidationResult result =
-                EmployeeValidator.employeeValidator()
+                employeeItemValidator
                         .validate(employee, 1);
 
         assertFalse(result.isValidationSuccessful());
@@ -53,7 +55,7 @@ public class ItemValidationIntegrationTest {
 
         assertTrue(errors.stream()
                 .anyMatch(e ->
-                        e.getField().equals("employeeId")
+                        e.getField().equals("id")
                                 && e.getMessage().equals("Employee ID must contain digits only.")));
 
         assertTrue(errors.stream()
