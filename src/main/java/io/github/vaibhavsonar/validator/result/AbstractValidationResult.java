@@ -1,37 +1,48 @@
 package io.github.vaibhavsonar.validator.result;
 
+import io.github.vaibhavsonar.validator.model.Error;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import io.github.vaibhavsonar.validator.model.Error;
 
 /**
- * Base implementation of {@link ValidationResult} that provides storage for
- * validation errors.
+ * Base implementation of {@link ValidationResult} that stores validation
+ * errors grouped by an integer index.
  * <p>
- * Validation errors are grouped by row number, where the key represents the
- * row associated with the validation errors. For single-object validation,
- * row index is used. For collection validation, the key is represented by the {@code 0}.
+ * An {@code AbstractValidationResult} provides the common error-storage
+ * mechanism used by concrete validation result types. Validation errors are
+ * associated with an index, allowing multiple validation operations to be
+ * represented in a single result.
  *
- * <p>Subclasses are responsible for specifying the validation type by
- * implementing {@link #validationType()}.
+ * <p>For item-level validation, the index typically identifies the item or
+ * row that produced the validation errors. For collection-level validation,
+ * the index can be used according to the collection validation contract.
+ *
+ * <p>This class is responsible only for storing and exposing validation
+ * errors. Concrete subclasses are responsible for identifying their
+ * validation scope by implementing {@link ValidationResult#validationType()}.
  *
  * @author Vaibhav Sonar
  */
 public abstract class AbstractValidationResult implements ValidationResult {
 
     /**
-     * Validation errors grouped by row number.
+     * Validation errors grouped by their associated index.
+     * <p>
+     * Each map entry associates an index with the validation errors produced
+     * for that index. Multiple errors can therefore be associated with the
+     * same index.
      */
     private final Map<Integer, List<Error>> errors = new HashMap<>();
 
     /**
-     * Returns the validation errors grouped by row number.
+     * Returns the validation errors grouped by index.
      * <p>
-     * The returned map is mutable and reflects the current state of the
-     * validation result.
+     * The returned map is the mutable map maintained by this result. Changes
+     * made to the returned map therefore affect the current validation result.
      *
-     * @return the validation errors grouped by row number
+     * @return the validation errors grouped by their associated index
      */
     @Override
     public Map<Integer, List<Error>> errors() {

@@ -1,13 +1,19 @@
 package io.github.vaibhavsonar.validator.model;
 
 /**
- * Represents a unique identifier for a validation rule.
+ * Identifies a validation rule.
  * <p>
- * A {@code RuleIdentifier} is used to uniquely identify individual validation
- * rules within a validator. It can be implemented using an enum, lambda
- * expression, or any class that provides a unique identifier.
+ * A {@code RuleIdentifier} provides a stable, application-defined identifier
+ * for a validation rule. It can be used to distinguish validation rules,
+ * associate validation configuration with a rule, and identify a specific
+ * validation rule when processing validation results or logs.
  *
- * <p>Using an enum is recommended for type safety and consistency:
+ * <p>The interface is functional, allowing rule identifiers to be implemented
+ * by enums, classes, or lambda expressions. Enums are recommended when an
+ * application has a fixed set of validation rules because they provide
+ * type-safe and consistent identifiers.
+ *
+ * <p>Example:
  * <pre>{@code
  * public enum PersonRule implements RuleIdentifier {
  *     NAME_REQUIRED,
@@ -26,9 +32,12 @@ package io.github.vaibhavsonar.validator.model;
 public interface RuleIdentifier {
 
     /**
-     * Returns the unique identifier for the validation rule.
+     * Returns the stable identifier of the validation rule.
      *
-     * @return the unique rule identifier
+     * <p>The returned value should uniquely identify the rule within the
+     * validation configuration where the identifier is used.
+     *
+     * @return the identifier of the validation rule
      */
     String ruleIdentifier();
 }

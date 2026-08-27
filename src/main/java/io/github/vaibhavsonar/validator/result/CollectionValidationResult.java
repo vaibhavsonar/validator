@@ -3,24 +3,28 @@ package io.github.vaibhavsonar.validator.result;
 import io.github.vaibhavsonar.validator.constants.ValidationType;
 
 /**
- * Default {@link ValidationResult} implementation for validating a collection
- * of objects.
+ * Validation result implementation for collection-level validation.
  * <p>
- * Validation errors are grouped by row number, where each key represents the
- * row of the input collection (for example, a row in a CSV or Excel file) and
- * the corresponding value contains all validation errors associated with that
- * row.
+ * A {@code CollectionValidationResult} stores validation errors produced while
+ * validating a collection of objects. Errors are inherited from
+ * {@link AbstractValidationResult} and are grouped by their associated index.
  *
- * <p>The returned validation type is {@link ValidationType#COLLECTION}.
+ * <p>For collection validation, an index typically identifies the position or
+ * row associated with the validation error, such as a row in a CSV, Excel
+ * file, or other batch input.
+ *
+ * <p>This result identifies its validation scope as
+ * {@link ValidationType#COLLECTION}.
  *
  * @author Vaibhav Sonar
  */
 public class CollectionValidationResult extends AbstractValidationResult {
 
     /**
-     * Returns the validation type represented by this result.
+     * Returns the validation scope represented by this result.
      *
-     * @return {@link ValidationType#COLLECTION}
+     * @return {@link ValidationType#COLLECTION}, indicating that this result
+     * contains collection-level validation results
      */
     @Override
     public ValidationType validationType() {

@@ -4,14 +4,24 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 /**
- * Represents a validation error for a field.
+ * Represents a validation error produced when a validation rule fails.
  * <p>
- * Each instance captures the field that failed validation, the rejected value,
- * and a human-readable validation message describing the reason for the failure.
- * Validation frameworks typically return one or more {@code Error} instances
- * as part of a validation result.
+ * An {@code Error} contains the field or property associated with the
+ * validation failure, the value that was rejected by the validation rule,
+ * and a human-readable message describing the failure.
  *
- * <p>This class uses chained accessors, allowing properties to be set fluently:
+ * <p>The {@code field} may identify a field on the validated object or a
+ * collection-level validation target. Nested fields may be represented using
+ * dot notation. For example, {@code address.city} identifies the
+ * {@code city} field of an {@code address} object.
+ *
+ * <p>The {@code rejectedValue} contains the value that caused the validation
+ * failure. Depending on the validation scope, this may be a field value, an
+ * entire object, or a collection.
+ *
+ * <p>This class uses Lombok's chained accessors, allowing validation errors
+ * to be constructed using a fluent API:
+ *
  * <pre>{@code
  * Error error = new Error()
  *         .setField("age")
@@ -26,17 +36,25 @@ import lombok.experimental.Accessors;
 public class Error {
 
     /**
-     * Name of the field that failed validation.
+     * Name of the field or validation target associated with the failure.
+     * <p>
+     * For nested objects, the field may use dot notation, such as
+     * {@code address.city}. For validation that applies to an entire object
+     * or collection, the field may identify the object or collection as a
+     * whole.
      */
     private String field;
 
     /**
-     * Value that was rejected during validation.
+     * Value rejected by the validation rule.
+     * <p>
+     * The rejected value depends on the validation scope. It may represent
+     * an individual field value, an entire item, or an entire collection.
      */
     private Object rejectedValue;
 
     /**
-     * Human-readable message describing the validation failure.
+     * Human-readable message describing why the validation failed.
      */
     private String message;
 }

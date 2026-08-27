@@ -1,13 +1,9 @@
 package io.github.vaibhavsonar.validator.item;
 
 import io.github.vaibhavsonar.validator.constants.ValidationType;
-import io.github.vaibhavsonar.validator.helper.AddressValidator;
-import io.github.vaibhavsonar.validator.helper.EmployeeValidator;
-import io.github.vaibhavsonar.validator.helper.model.Address;
-import io.github.vaibhavsonar.validator.helper.model.Employee;
+import io.github.vaibhavsonar.validator.model.Error;
 import io.github.vaibhavsonar.validator.result.ItemValidationResult;
 import org.junit.jupiter.api.Test;
-import io.github.vaibhavsonar.validator.model.Error;
 
 import java.util.List;
 
@@ -15,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ItemValidatorBuilderTest {
 
-    private static final int ROW = 1;
+    private static final int INDEX = 1;
 
     @Test
     void validationType_shouldReturnItem() {
@@ -25,7 +21,7 @@ public class ItemValidatorBuilderTest {
     }
 
     @Test
-    void addError_shouldStoreErrorAgainstRow() {
+    void addError_shouldStoreErrorAgainstIndex() {
         ItemValidationResult result = new ItemValidationResult();
 
         Error error = new Error()
@@ -33,11 +29,11 @@ public class ItemValidatorBuilderTest {
                 .setRejectedValue("123")
                 .setMessage("Invalid");
 
-        result.addError(error, ROW);
+        result.addError(error, INDEX);
 
         assertEquals(1, result.errors().size());
 
-        List<Error> errors = result.errors().get(ROW);
+        List<Error> errors = result.errors().get(INDEX);
 
         assertNotNull(errors);
         assertEquals(1, errors.size());
@@ -56,9 +52,9 @@ public class ItemValidatorBuilderTest {
                 .setField("address")
                 .setMessage("Invalid address");
 
-        result.addErrors(List.of(error1, error2), ROW);
+        result.addErrors(List.of(error1, error2), INDEX);
 
-        List<Error> errors = result.errors().get(ROW);
+        List<Error> errors = result.errors().get(INDEX);
 
         assertNotNull(errors);
         assertEquals(2, errors.size());
@@ -71,15 +67,15 @@ public class ItemValidatorBuilderTest {
 
         first.addError(
                 new Error().setField("id").setMessage("Invalid"),
-                ROW);
+                INDEX);
 
         second.addError(
                 new Error().setField("address").setMessage("Required"),
-                ROW);
+                INDEX);
 
         first.addErrorsFrom(second);
 
-        List<Error> errors = first.errors().get(ROW);
+        List<Error> errors = first.errors().get(INDEX);
 
         assertNotNull(errors);
         assertEquals(2, errors.size());
@@ -98,7 +94,7 @@ public class ItemValidatorBuilderTest {
 
         result.addError(
                 new Error().setField("id").setMessage("Invalid"),
-                ROW);
+                INDEX);
 
         assertFalse(result.isValidationSuccessful());
     }

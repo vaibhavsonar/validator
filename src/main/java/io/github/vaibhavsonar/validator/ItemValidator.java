@@ -3,32 +3,48 @@ package io.github.vaibhavsonar.validator;
 import io.github.vaibhavsonar.validator.result.ItemValidationResult;
 
 /**
- * Defines the contract for validating a single object.
+ * Defines the contract for validating a single item.
  * <p>
- * Implementations validate an object of the specified type and return an
- * {@link ItemValidationResult} containing any validation errors.
+ * An {@code ItemValidator} validates an object of type {@code T} and returns
+ * an {@link ItemValidationResult} containing the validation errors produced
+ * during that operation.
  *
- * <p>{@code ItemValidator} is intended for validating an individual object,
- * including its fields and nested objects. Validation rules that operate on an
- * entire collection, such as duplicate detection or cross-record validation,
- * should be implemented using {@code CollectionValidator}.
+ * <p>An item validator can perform validation at different levels within the
+ * item, including:
+ * <ul>
+ *     <li>validation of the item as a whole,</li>
+ *     <li>validation of individual fields, and</li>
+ *     <li>validation of nested objects.</li>
+ * </ul>
  *
- * @param <T> the type of object to validate
+ * <p>Validation rules that require access to multiple items simultaneously,
+ * such as duplicate detection, uniqueness checks, or cross-record
+ * consistency checks, should be implemented using a
+ * {@link CollectionValidator}.
  *
+ * @param <T> the type of item to validate
  * @author Vaibhav Sonar
  */
 public interface ItemValidator<T> {
 
     /**
-     * Validates the supplied object.
+     * Validates the supplied item.
+     * <p>
+     * The validator applies its configured item-level, field-level, and
+     * nested-object validation logic and returns an
+     * {@link ItemValidationResult} containing all validation errors produced
+     * during the operation.
      *
-     * @param objectToValidate the object to validate
-     * @param index the row number associated with the object. This value is
-     *                  propagated to the validation result so that validation
-     *                  errors can be associated with their originating row when
-     *                  the object belongs to a larger dataset. For standalone
-     *                  object validation, this value is typically {@code 0}.
-     * @return the validation result
+     * <p>The supplied index is propagated to the validation result so that
+     * errors can be associated with the item or validation position from
+     * which they originated. For standalone validation, callers may use
+     * {@code 0} or another appropriate index according to their application
+     * context.
+     *
+     * @param objectToValidate the item to validate
+     * @param index            the index associated with the validation operation
+     * @return the validation result containing any validation errors produced
+     * while validating the item
      */
     ItemValidationResult validate(T objectToValidate, int index);
 }

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ConditionalItemValidatorTest {
-    private static final int ROW = 1;
+    private static final int INDEX = 1;
 
     @Test
     void validate_whenConditionMatches_shouldExecuteValidator() {
@@ -16,13 +16,13 @@ public class ConditionalItemValidatorTest {
         Employee employee = new Employee()
                 .setId("EMP001");
 
-        ItemValidator<Employee> validator = (emp, row) -> {
+        ItemValidator<Employee> validator = (emp, index) -> {
             ItemValidationResult result = new ItemValidationResult();
             result.addError(
                     new io.github.vaibhavsonar.validator.model.Error()
                             .setField("id")
                             .setMessage("Invalid"),
-                    row
+                    index
             );
             return result;
         };
@@ -33,11 +33,11 @@ public class ConditionalItemValidatorTest {
                         validator);
 
         ItemValidationResult result =
-                conditionalValidator.validate(employee, ROW);
+                conditionalValidator.validate(employee, INDEX);
 
         assertFalse(result.isValidationSuccessful());
         assertEquals(1, result.errors().size());
-        assertTrue(result.errors().containsKey(ROW));
+        assertTrue(result.errors().containsKey(INDEX));
     }
 
     @Test
@@ -46,7 +46,7 @@ public class ConditionalItemValidatorTest {
         Employee employee = new Employee()
                 .setId("EMP001");
 
-        ItemValidator<Employee> validator = (emp, row) -> {
+        ItemValidator<Employee> validator = (emp, index) -> {
             fail("Validator should not be invoked.");
             return new ItemValidationResult();
         };
@@ -57,7 +57,7 @@ public class ConditionalItemValidatorTest {
                         validator);
 
         ItemValidationResult result =
-                conditionalValidator.validate(employee, ROW);
+                conditionalValidator.validate(employee, INDEX);
 
         assertTrue(result.isValidationSuccessful());
         assertTrue(result.errors().isEmpty());
@@ -73,10 +73,10 @@ public class ConditionalItemValidatorTest {
                 new io.github.vaibhavsonar.validator.model.Error()
                         .setField("id")
                         .setMessage("Id is required"),
-                ROW
+                INDEX
         );
 
-        ItemValidator<Employee> validator = (emp, row) -> expected;
+        ItemValidator<Employee> validator = (emp, index) -> expected;
 
         ConditionalItemValidator<Employee> conditionalValidator =
                 new ConditionalItemValidator<>(
@@ -84,7 +84,7 @@ public class ConditionalItemValidatorTest {
                         validator);
 
         ItemValidationResult actual =
-                conditionalValidator.validate(employee, ROW);
+                conditionalValidator.validate(employee, INDEX);
 
         assertSame(expected, actual);
     }

@@ -11,11 +11,12 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ConditionalCollectionValidatorTest {
+    private static final int INDEX = 0;
 
     @Test
     void validate_whenConditionMatches_shouldExecuteValidator() {
 
-        CollectionValidator<Employee> validator = employees -> {
+        CollectionValidator<Employee> validator = (employees, index) -> {
             CollectionValidationResult result = new CollectionValidationResult();
             result.addError(
                     new Error()
@@ -32,7 +33,7 @@ class ConditionalCollectionValidatorTest {
                         validator);
 
         CollectionValidationResult result =
-                conditionalValidator.validate(List.of(new Employee()));
+                conditionalValidator.validate(List.of(new Employee()), INDEX);
 
         assertFalse(result.isValidationSuccessful());
         assertEquals(1, result.errors().size());
@@ -42,7 +43,7 @@ class ConditionalCollectionValidatorTest {
     @Test
     void validate_whenConditionDoesNotMatch_shouldSkipValidation() {
 
-        CollectionValidator<Employee> validator = employees -> {
+        CollectionValidator<Employee> validator = (employees, index) -> {
             fail("Validator should not be invoked.");
             return new CollectionValidationResult();
         };
@@ -53,7 +54,7 @@ class ConditionalCollectionValidatorTest {
                         validator);
 
         CollectionValidationResult result =
-                conditionalValidator.validate(List.of(new Employee()));
+                conditionalValidator.validate(List.of(new Employee()), INDEX);
 
         assertTrue(result.isValidationSuccessful());
         assertTrue(result.errors().isEmpty());
@@ -70,7 +71,7 @@ class ConditionalCollectionValidatorTest {
                 0
         );
 
-        CollectionValidator<Employee> validator = employees -> expected;
+        CollectionValidator<Employee> validator = (employees, index) -> expected;
 
         ConditionalCollectionValidator<Employee> conditionalValidator =
                 new ConditionalCollectionValidator<>(
@@ -78,7 +79,7 @@ class ConditionalCollectionValidatorTest {
                         validator);
 
         CollectionValidationResult actual =
-                conditionalValidator.validate(List.of(new Employee()));
+                conditionalValidator.validate(List.of(new Employee()), INDEX);
 
         assertSame(expected, actual);
     }

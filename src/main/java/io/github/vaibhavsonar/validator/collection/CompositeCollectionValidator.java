@@ -1,88 +1,110 @@
 package io.github.vaibhavsonar.validator.collection;
 
 import io.github.vaibhavsonar.validator.CollectionValidator;
-import io.github.vaibhavsonar.validator.model.RuleIdentifier;
 import io.github.vaibhavsonar.validator.result.CollectionValidationResult;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
- * A composite implementation of {@link CollectionValidator} that executes
- * multiple collection validation rules and aggregates their results.
+ * Composite implementation of {@link CollectionValidator} that executes
+ * multiple collection validators and aggregates their validation results.
  * <p>
- * Validation rules are identified using {@link RuleIdentifier} and are
- * executed in the order they are registered. The validation result contains
- * the combined errors produced by all configured collection validators.
+ * A {@code CompositeCollectionValidator} maintains an ordered collection of
+ * {@link CollectionValidator collection validators}. Each registered validator
+ * is executed against the supplied collection, and the validation errors
+ * produced by all validators are combined into a single
+ * {@link CollectionValidationResult}.
  *
- * <p>This validator is intended for collection-level validation scenarios,
- * such as duplicate detection, cross-record validation, uniqueness checks,
- * and other rules that require access to the entire collection.
+ * <p>Validators are executed in the order in which they are registered.
+ * This allows multiple independent collection-level validation concerns to
+ * be combined into a single validator.
+ *
+ * <p>This validator is intended for collection-level validation scenarios such
+ * as duplicate detection, uniqueness checks, collection size constraints,
+ * cross-record validation, and other rules that require access to multiple
+ * items at the same time.
  *
  * @param <T> the type of objects contained in the collection
- *
  * @author Vaibhav Sonar
  */
 @Slf4j
-public class CompositeCollectionValidator<T> implements CollectionValidator<T> {
+public class CompositeCollectionValidator<T>
+        implements CollectionValidator<T> {
 
     /**
-     * Collection validation rules associated with their identifiers.
+     * Collection validators registered with this composite validator.
+     * <p>
+     * Validators are stored in registration order and are executed in that
+     * same order when {@link #validate(List, int)} is invoked.
      */
-    private final Map<RuleIdentifier, CollectionValidator<T>> rules = new HashMap<>();
+    private final List<CollectionValidator<T>> validators = new ArrayList<>();
 
     /**
-     * Registers a collection validation rule.
+     * Registers a collection validator.
+     * <p>
+     * The supplied validator is appended to the list of configured validators
+     * and will be executed when this composite validator validates a
+     * collection.
      *
-     * @param ruleIdentifier the unique identifier of the validation rule
-     * @param validator the validator associated with the rule
+     * @param validator the collection validator to register
      * @return this validator for method chaining
      */
-    public CompositeCollectionValidator<T> addRule(RuleIdentifier ruleIdentifier, CollectionValidator<T> validator) {
-        rules.put(ruleIdentifier, validator);
+    public CompositeCollectionValidator<T> addRule(
+            CollectionValidator<T> validator) {
+        validators.add(validator);
         return this;
     }
 
     /**
-     * Registers all validation rules from another composite collection validator.
+     * Registers all validators from another
+     * {@code CompositeCollectionValidator}.
      * <p>
-     * All rules configured in the supplied validator are added to this validator.
-     * If a rule with the same {@link RuleIdentifier} already exists, it is
-     * replaced by the corresponding rule from the supplied validator.
+     * The validators contained in the supplied composite are appended to this
+     * composite in their existing order. Existing validators in this
+     * composite are retained.
      *
-     * @param compositeValidator the composite validator whose validation rules
+     * @param compositeValidator the composite validator whose validators
      *                           should be added
      * @return this validator for method chaining
      */
     public CompositeCollectionValidator<T> addRules(
             CompositeCollectionValidator<T> compositeValidator) {
-
-        compositeValidator.rules.forEach(this::addRule);
+        compositeValidator.validators.forEach(this::addRule);
         return this;
     }
 
     /**
-     * Validates the supplied collection by executing all registered
-     * collection validation rules.
+     * Validates the supplied collection using all registered collection
+     * validators.
+     * <p>
+     * Each registered validator is executed with the supplied collection and
+     * index. The validation errors produced by each validator are aggregated
+     * into a single {@link CollectionValidationResult}.
      *
-     * <p>The execution of each rule is logged before and after validation.
-     * The validation errors produced by all configured validators are
-     * aggregated into a single {@link CollectionValidationResult}.
+     * <p>If no registered validator produces an error, the returned result
+     * represents a successful validation.
      *
-     * @param objectToValidate the collection to validate
-     * @return the aggregated validation result
+     * @param items the collection to validate
+     * @param index the index associated with the validation operation
+     * @return the aggregated validation result produced by all registered
+     * collection validators
      */
     @Override
-    public CollectionValidationResult validate(List<T> objectToValidate) {
+    public CollectionValidationResult validate(
+            List<T> items,
+            int index) {
+
         CollectionValidationResult validationResult = new CollectionValidationResult();
-        rules.forEach((ruleId, validator) -> {
-            log.info("Validating rule = [{}]", ruleId.ruleIdentifier());
-            CollectionValidationResult result = validator.validate(objectToValidate);
+
+        validators.forEach(rule -> {
+            CollectionValidationResult result =
+                    rule.validate(items, index);
+
             validationResult.addErrorsFrom(result);
-            log.info("Validated rule = [{}], Validation Result = [{}]", ruleId.ruleIdentifier(), result);
         });
+
         return validationResult;
     }
 }

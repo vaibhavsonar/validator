@@ -1,7 +1,9 @@
 package io.github.vaibhavsonar.validator.field;
 
 import io.github.vaibhavsonar.validator.helper.TestRule;
-import io.github.vaibhavsonar.validator.rule.ValidationRule;
+import io.github.vaibhavsonar.validator.helper.model.Employee;
+import io.github.vaibhavsonar.validator.rule.FieldValidationRule;
+import io.github.vaibhavsonar.validator.rule.builder.FieldRuleBuilder;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -13,56 +15,64 @@ class FieldRuleBuilderTest {
     @Test
     void check_shouldAddSingleRule() {
 
-        FieldRuleBuilder<String> builder = new FieldRuleBuilder<>();
+        FieldRuleBuilder<Employee, String> builder = new FieldRuleBuilder<>();
 
         builder.check(
                 TestRule.ID_REQUIRED,
+                "id",
+                Employee::getId,
                 String::isBlank,
                 "Id is required");
 
-        List<ValidationRule<String>> rules = builder.getRules();
+        List<FieldValidationRule<Employee, String>> rules = builder.build();
 
         assertEquals(1, rules.size());
 
-        ValidationRule<String> rule = rules.get(0);
+        FieldValidationRule<Employee, String> rule = rules.get(0);
 
-        assertEquals(TestRule.ID_REQUIRED, rule.getRuleIdentifier());
-        assertEquals("Id is required", rule.getMessage());
+        assertEquals(TestRule.ID_REQUIRED, rule.ruleIdentifier());
+        assertEquals("Id is required", rule.message());
 
-        assertTrue(rule.getPredicate().test(""));
-        assertFalse(rule.getPredicate().test("EMP001"));
+        assertTrue(rule.predicate().test(""));
+        assertFalse(rule.predicate().test("EMP001"));
     }
 
     @Test
     void check_shouldSupportMultipleRules() {
 
-        FieldRuleBuilder<String> builder = new FieldRuleBuilder<>();
+        FieldRuleBuilder<Employee, String> builder = new FieldRuleBuilder<>();
 
         builder.check(
                 TestRule.ID_REQUIRED,
+                "id",
+                Employee::getId,
                 String::isBlank,
                 "Id is required");
 
         builder.check(
                 TestRule.ID_INVALID,
+                "id",
+                Employee::getId,
                 id -> id.length() < 5,
                 "Invalid Id");
 
-        List<ValidationRule<String>> rules = builder.getRules();
+        List<FieldValidationRule<Employee, String>> rules = builder.build();
 
         assertEquals(2, rules.size());
 
-        assertEquals(TestRule.ID_REQUIRED, rules.get(0).getRuleIdentifier());
-        assertEquals(TestRule.ID_INVALID, rules.get(1).getRuleIdentifier());
+        assertEquals(TestRule.ID_REQUIRED, rules.get(0).ruleIdentifier());
+        assertEquals(TestRule.ID_INVALID, rules.get(1).ruleIdentifier());
     }
 
     @Test
     void check_shouldReturnSameBuilderForMethodChaining() {
 
-        FieldRuleBuilder<String> builder = new FieldRuleBuilder<>();
+        FieldRuleBuilder<Employee, String> builder = new FieldRuleBuilder<>();
 
-        FieldRuleBuilder<String> returned = builder.check(
+        FieldRuleBuilder<Employee, String> returned = builder.check(
                 TestRule.ID_REQUIRED,
+                "id",
+                Employee::getId,
                 String::isBlank,
                 "Id is required");
 
