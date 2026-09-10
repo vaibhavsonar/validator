@@ -6,6 +6,7 @@ import io.github.vaibhavsonar.validator.rule.ItemValidationRuleImpl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -23,7 +24,7 @@ import java.util.function.Predicate;
  * {@code false}, the item passes that rule.
  *
  * <p>Multiple independent item-level rules can be configured using successive
- * calls to {@link #check(RuleIdentifier, String, Predicate, String)}. The rules are
+ * calls to {@link #check(RuleIdentifier, String, List, Predicate, String)}. The rules are
  * retained in registration order and returned by {@link #build()}.
  *
  * <p>The builder can be created either directly using its public constructor
@@ -37,11 +38,15 @@ import java.util.function.Predicate;
  * rules
  *     .check(
  *         PersonRule.AGE_INVALID,
+ *         "age",
+ *         List.of(Person::getAge),
  *         person -> person.getAge() < 18,
  *         "Person must be at least 18 years old"
  *     )
  *     .check(
  *         PersonRule.NAME_AND_AGE_INVALID,
+ *         "name-age",
+ *         List.of(Person::getName, Person::getAge),
  *         person -> person.getName() == null && person.getAge() == null,
  *         "Name and age cannot both be null"
  *     );
@@ -66,7 +71,7 @@ public class ItemRuleBuilder<T> {
      * Creates a new, empty {@code ItemRuleBuilder}.
      * <p>
      * The returned builder contains no validation rules. Rules can be added
-     * using {@link #check(RuleIdentifier, String, Predicate, String)}.
+     * using {@link #check(RuleIdentifier, String, List, Predicate, String)}.
      *
      * @param <T> the type of item to be validated
      * @return a new, empty {@code ItemRuleBuilder}
@@ -83,8 +88,15 @@ public class ItemRuleBuilder<T> {
      * considered to have violated the validation rule and the specified
      * validation message is reported.
      *
+     * <p>Each function in {@code gettersForRejectedValue} is applied to the item
+     * when the rule fails. The resulting values are reported as the rejected
+     * value(s) in the validation error.
+     *
      * @param ruleIdentifier the identifier of the validation rule
      * @param fieldName the field name for which the rule is being applied
+     * @param gettersForRejectedValue functions used to extract the value(s) that
+     *                                 should be reported as rejected values when
+     *                                 the rule fails
      * @param predicate      the predicate used to determine whether the item
      *                       violates the validation rule
      * @param message        the validation message reported when the rule fails
@@ -92,11 +104,13 @@ public class ItemRuleBuilder<T> {
      */
     public ItemRuleBuilder<T> check(RuleIdentifier ruleIdentifier,
                                     String fieldName,
+                                    List<Function<T, Object>> gettersForRejectedValue,
                                     Predicate<T> predicate,
                                     String message) {
         rules.add(new ItemValidationRuleImpl<>(
                 ruleIdentifier,
                 fieldName,
+                gettersForRejectedValue,
                 predicate,
                 message
         ));

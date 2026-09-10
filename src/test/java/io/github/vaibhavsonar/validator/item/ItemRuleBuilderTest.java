@@ -21,6 +21,7 @@ class ItemRuleBuilderTest {
                 .check(
                         TestRuleId.EMPLOYEE_REQUIRED,
                         "employee",
+                        List.of(employee -> employee),
                         employee -> employee == null,
                         "Employee must not be null"
                 )
@@ -45,6 +46,7 @@ class ItemRuleBuilderTest {
                 .check(
                         TestRuleId.EMPLOYEE_ADULT,
                         "age",
+                        List.of(Employee::getAge),
                         employee -> employee.getAge() < 18,
                         "Employee must be at least 18 years old"
                 )
@@ -79,18 +81,21 @@ class ItemRuleBuilderTest {
                 .check(
                         TestRuleId.EMPLOYEE_REQUIRED,
                         "employee",
+                        List.of(employee -> employee),
                         employee -> employee == null,
                         "Employee must not be null"
                 )
                 .check(
                         TestRuleId.EMPLOYEE_ADULT,
                         "age",
+                        List.of(Employee::getAge),
                         employee -> employee.getAge() < 18,
                         "Employee must be at least 18 years old"
                 )
                 .check(
                         TestRuleId.EMPLOYEE_ACTIVE,
                         "active",
+                        List.of(Employee::getActive),
                         employee -> !Boolean.TRUE.equals(employee.getActive()),
                         "Employee must be active"
                 )
@@ -121,6 +126,7 @@ class ItemRuleBuilderTest {
         ItemRuleBuilder<Employee> result = builder.check(
                 TestRuleId.EMPLOYEE_REQUIRED,
                 "employee",
+                List.of(employee -> employee),
                 employee -> employee == null,
                 "Employee must not be null"
         );
@@ -145,6 +151,7 @@ class ItemRuleBuilderTest {
         builder.check(
                 TestRuleId.EMPLOYEE_REQUIRED,
                 "employee",
+                List.of(employee -> employee),
                 employee -> employee == null,
                 "Employee must not be null"
         );
@@ -166,6 +173,7 @@ class ItemRuleBuilderTest {
                 .check(
                         TestRuleId.ADDRESS_REQUIRED,
                         "address",
+                        List.of(address -> address),
                         address -> address == null,
                         "Address must not be null"
                 )

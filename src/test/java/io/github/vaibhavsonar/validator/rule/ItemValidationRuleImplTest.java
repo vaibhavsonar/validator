@@ -7,6 +7,8 @@ import io.github.vaibhavsonar.validator.model.Error;
 import io.github.vaibhavsonar.validator.model.RuleIdentifier;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,6 +21,7 @@ class ItemValidationRuleImplTest {
                 new ItemValidationRuleImpl<>(
                         TestRuleId.EMPLOYEE_AGE,
                         "age",
+                        List.of(Employee::getAge),
                         employee -> employee.getAge() < 18,
                         "Employee must be at least 18 years old"
                 );
@@ -38,6 +41,7 @@ class ItemValidationRuleImplTest {
                 new ItemValidationRuleImpl<>(
                         TestRuleId.EMPLOYEE_AGE,
                         "age",
+                        List.of(Employee::getAge),
                         value -> value.getAge() < 18,
                         "Employee must be at least 18 years old"
                 );
@@ -49,7 +53,12 @@ class ItemValidationRuleImplTest {
         Error error = result.get();
 
         assertEquals("age", error.getField());
-        assertSame(employee, error.getRejectedValue());
+
+        assertInstanceOf(List.class, result.get().getRejectedValue());
+        List<Object> rejectedValues = new ArrayList<>((List) result.get().getRejectedValue());
+
+        assertTrue(rejectedValues.contains(employee.getAge()));
+
         assertEquals(
                 "Employee must be at least 18 years old",
                 error.getMessage()
@@ -68,6 +77,7 @@ class ItemValidationRuleImplTest {
                 new ItemValidationRuleImpl<>(
                         TestRuleId.EMPLOYEE_AGE,
                         "age",
+                        List.of(Employee::getAge),
                         value -> value.getAge() < 18,
                         "Employee must be at least 18 years old"
                 );
@@ -96,6 +106,7 @@ class ItemValidationRuleImplTest {
                 new ItemValidationRuleImpl<>(
                         TestRuleId.EMPLOYEE_AGE,
                         "age",
+                        List.of(Employee::getAge),
                         value -> value.getAge() < 18,
                         "Employee must be an adult"
                 );
@@ -103,7 +114,10 @@ class ItemValidationRuleImplTest {
         Optional<Error> result = rule.validate(null, employee, 10);
 
         assertTrue(result.isPresent());
-        assertSame(employee, result.get().getRejectedValue());
+
+        assertInstanceOf(List.class, result.get().getRejectedValue());
+        List<Object> rejectedValues = new ArrayList<>((List) result.get().getRejectedValue());
+        assertTrue(rejectedValues.contains(employee.getAge()));
     }
 
     @Test
@@ -118,6 +132,7 @@ class ItemValidationRuleImplTest {
                 new ItemValidationRuleImpl<>(
                         TestRuleId.EMPLOYEE_REQUIRED,
                         "name-age",
+                        List.of(Employee::getAge, Employee::getName),
                         value -> value.getName() == null
                                 || value.getName().isBlank()
                                 || value.getAge() < 18,
@@ -128,7 +143,12 @@ class ItemValidationRuleImplTest {
 
         assertTrue(result.isPresent());
         assertEquals("name-age", result.get().getField());
-        assertSame(employee, result.get().getRejectedValue());
+
+        assertInstanceOf(List.class, result.get().getRejectedValue());
+        List<Object> rejectedValues = new ArrayList<>((List) result.get().getRejectedValue());
+        assertTrue(rejectedValues.contains(employee.getName()));
+        assertTrue(rejectedValues.contains(employee.getAge()));
+
         assertEquals("Employee data is invalid", result.get().getMessage());
     }
 
@@ -144,6 +164,7 @@ class ItemValidationRuleImplTest {
                 new ItemValidationRuleImpl<>(
                         TestRuleId.EMPLOYEE_ACTIVE,
                         "active",
+                        List.of(Employee::getActive),
                         value -> !Boolean.TRUE.equals(value.getActive()),
                         "Employee must be active"
                 );
@@ -173,6 +194,7 @@ class ItemValidationRuleImplTest {
                 new ItemValidationRuleImpl<>(
                         TestRuleId.EMPLOYEE_REQUIRED,
                         "employee",
+                        List.of(emp -> emp.getAddress().getCity()),
                         value -> value.getAddress() == null
                                 || value.getAddress().getCity() == null
                                 || value.getAddress().getCity().isBlank(),
@@ -186,7 +208,12 @@ class ItemValidationRuleImplTest {
         Error error = result.get();
 
         assertEquals("employee", error.getField());
-        assertSame(employee, error.getRejectedValue());
+
+        assertInstanceOf(List.class, result.get().getRejectedValue());
+        List<Object> rejectedValues = new ArrayList<>((List) result.get().getRejectedValue());
+
+        assertTrue(rejectedValues.contains(employee.getAddress().getCity()));
+
         assertEquals(
                 "Employee address city must not be empty",
                 error.getMessage()
@@ -205,6 +232,7 @@ class ItemValidationRuleImplTest {
                 new ItemValidationRuleImpl<>(
                         TestRuleId.ADDRESS_REQUIRED,
                         "city",
+                        List.of(Address::getCity),
                         value -> value.getCity() == null
                                 || value.getCity().isBlank(),
                         "Address city must not be empty"
@@ -217,7 +245,11 @@ class ItemValidationRuleImplTest {
         Error error = result.get();
 
         assertEquals("city", error.getField());
-        assertSame(address, error.getRejectedValue());
+
+        assertInstanceOf(List.class, result.get().getRejectedValue());
+        List<Object> rejectedValues = new ArrayList<>((List) result.get().getRejectedValue());
+        assertTrue(rejectedValues.contains(address.getCity()));
+
         assertEquals(
                 "Address city must not be empty",
                 error.getMessage()
@@ -230,6 +262,7 @@ class ItemValidationRuleImplTest {
                 new ItemValidationRuleImpl<>(
                         TestRuleId.EMPLOYEE_AGE,
                         "age",
+                        List.of(Employee::getAge),
                         employee -> employee.getAge() < 18,
                         "Employee must be an adult"
                 );
@@ -254,6 +287,7 @@ class ItemValidationRuleImplTest {
                 new ItemValidationRuleImpl<>(
                         TestRuleId.EMPLOYEE_AGE,
                         "age",
+                        List.of(Employee::getAge),
                         predicate,
                         "Employee must be an adult"
                 );
@@ -268,6 +302,7 @@ class ItemValidationRuleImplTest {
                 new ItemValidationRuleImpl<>(
                         TestRuleId.EMPLOYEE_AGE,
                         "age",
+                        List.of(Employee::getAge),
                         employee -> employee.getAge() < 18,
                         "Employee must be an adult"
                 );

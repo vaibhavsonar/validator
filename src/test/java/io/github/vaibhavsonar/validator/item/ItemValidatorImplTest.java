@@ -41,6 +41,7 @@ class ItemValidatorImplTest {
                         List.of(new ItemValidationRuleImpl<>(
                                 TestRule.ID_REQUIRED,
                                 "employee",
+                                List.of(Employee::getId),
                                 employee -> false,
                                 "Employee is invalid"
                         ))
@@ -66,6 +67,7 @@ class ItemValidatorImplTest {
                         List.of(new ItemValidationRuleImpl<>(
                                 TestRule.ID_REQUIRED,
                                 "employee",
+                                List.of(employee ->  employee),
                                 employee -> true,
                                 "Employee is invalid"
                         ))
@@ -89,7 +91,12 @@ class ItemValidatorImplTest {
         Error error = errors.get(0);
 
         assertEquals("employee", error.getField());
-        assertSame(employee, error.getRejectedValue());
+//        assertSame(employee, error.getRejectedValue());
+
+        assertInstanceOf(List.class, error.getRejectedValue());
+        List<Object> rejectedValues = new ArrayList<>((List) error.getRejectedValue());
+        assertTrue(rejectedValues.contains(employee));
+
         assertEquals("Employee is invalid", error.getMessage());
     }
 
@@ -100,12 +107,14 @@ class ItemValidatorImplTest {
                         List.of(new ItemValidationRuleImpl<>(
                                         TestRule.ID_REQUIRED,
                                         "age",
+                                        List.of(Employee::getAge),
                                         employee -> employee.getAge() < 18,
                                         "Employee must be at least 18"
                                 ),
                                 new ItemValidationRuleImpl<>(
-                                        TestRule.ID_INVALID,
+                                        TestRule.ACTIVE_INVALID,
                                         "active",
+                                        List.of(Employee::getActive),
                                         employee -> !Boolean.TRUE.equals(employee.getActive()),
                                         "Employee must be active"
                                 ))
@@ -148,12 +157,14 @@ class ItemValidatorImplTest {
                         List.of(new ItemValidationRuleImpl<>(
                                         TestRule.ID_REQUIRED,
                                         "employee",
+                                        List.of(Employee::getId),
                                         employee -> false,
                                         "This error should not be returned"
                                 ),
                                 new ItemValidationRuleImpl<>(
                                         TestRule.ID_INVALID,
                                         "employee",
+                                        List.of(employee ->  employee),
                                         employee -> true,
                                         "Employee is invalid"
                                 ))
@@ -181,6 +192,7 @@ class ItemValidatorImplTest {
                         List.of(new ItemValidationRuleImpl<>(
                                         TestRule.ID_REQUIRED,
                                         "id",
+                                        List.of(Employee::getId),
                                         employee -> {
                                             executionCount.incrementAndGet();
                                             return false;
@@ -190,6 +202,7 @@ class ItemValidatorImplTest {
                                 new ItemValidationRuleImpl<>(
                                         TestRule.ID_INVALID,
                                         "id",
+                                        List.of(Employee::getId),
                                         employee -> {
                                             executionCount.incrementAndGet();
                                             return false;
@@ -199,6 +212,7 @@ class ItemValidatorImplTest {
                                 new ItemValidationRuleImpl<>(
                                         TestRule.AGE_INVALID,
                                         "age",
+                                        List.of(Employee::getAge),
                                         employee -> {
                                             executionCount.incrementAndGet();
                                             return false;
@@ -220,6 +234,7 @@ class ItemValidatorImplTest {
                         List.of(new ItemValidationRuleImpl<>(
                                         TestRule.ID_REQUIRED,
                                         "id",
+                                        List.of(Employee::getId),
                                         employee -> {
                                             executionOrder.add(1);
                                             return false;
@@ -229,6 +244,7 @@ class ItemValidatorImplTest {
                                 new ItemValidationRuleImpl<>(
                                         TestRule.ID_INVALID,
                                         "id",
+                                        List.of(Employee::getId),
                                         employee -> {
                                             executionOrder.add(2);
                                             return false;
@@ -238,6 +254,7 @@ class ItemValidatorImplTest {
                                 new ItemValidationRuleImpl<>(
                                         TestRule.AGE_INVALID,
                                         "age",
+                                        List.of(Employee::getAge),
                                         employee -> {
                                             executionOrder.add(3);
                                             return false;
@@ -259,6 +276,7 @@ class ItemValidatorImplTest {
                 new ItemValidationRuleImpl<>(
                         TestRule.ID_REQUIRED,
                         "employee",
+                        List.of(Employee::getId),
                         employee -> true,
                         "Employee is invalid"
                 );
@@ -281,6 +299,7 @@ class ItemValidatorImplTest {
                 new ItemValidationRuleImpl<>(
                         TestRule.ID_REQUIRED,
                         "employee",
+                        List.of(Employee::getId),
                         employee -> false,
                         "No error"
                 );
@@ -303,6 +322,7 @@ class ItemValidatorImplTest {
                 new ItemValidationRuleImpl<>(
                         TestRule.ID_REQUIRED,
                         "employee",
+                        List.of(Employee::getId),
                         employee -> true,
                         "Employee is invalid"
                 );
@@ -340,6 +360,7 @@ class ItemValidatorImplTest {
                 new ItemValidationRuleImpl<>(
                         TestRule.ID_REQUIRED,
                         "employee",
+                        List.of(Employee::getId),
                         value -> {
                             invocationCount.incrementAndGet();
 
@@ -377,6 +398,7 @@ class ItemValidatorImplTest {
                 new ItemValidationRuleImpl<>(
                         TestRule.ID_REQUIRED,
                         "employee",
+                        List.of(employee -> employee),
                         employee -> employee == null,
                         "Employee is required"
                 );
@@ -397,7 +419,10 @@ class ItemValidatorImplTest {
 
         assertEquals("Employee is required", error.getMessage());
         assertEquals("employee", error.getField());
-        assertNull(error.getRejectedValue());
+
+        assertInstanceOf(List.class, error.getRejectedValue());
+        List<Object> rejectedValues = new ArrayList<>((List) error.getRejectedValue());
+        assertTrue(rejectedValues.contains(null));
     }
 
     @Test
@@ -418,6 +443,7 @@ class ItemValidatorImplTest {
                         List.of(new ItemValidationRuleImpl<>(
                                 TestRule.ID_INVALID,
                                 "address",
+                                List.of(Employee::getAddress),
                                 value -> value.getAddress() == null
                                         || value.getAddress().getCity() == null
                                         || value.getAddress().getCity().isBlank(),
@@ -435,7 +461,11 @@ class ItemValidatorImplTest {
                 .get(0);
 
         assertEquals("address", error.getField());
-        assertSame(employee, error.getRejectedValue());
+
+        assertInstanceOf(List.class, error.getRejectedValue());
+        List<Object> rejectedValues = new ArrayList<>((List) error.getRejectedValue());
+        assertTrue(rejectedValues.contains(employee.getAddress()));
+
         assertEquals(
                 "Employee address city is required",
                 error.getMessage()
@@ -449,18 +479,21 @@ class ItemValidatorImplTest {
                         List.of(new ItemValidationRuleImpl<>(
                                         TestRule.ID_REQUIRED,
                                         "id",
+                                        List.of(Employee::getId),
                                         employee -> true,
                                         "First error"
                                 ),
                                 new ItemValidationRuleImpl<>(
                                         TestRule.ID_INVALID,
                                         "id",
+                                        List.of(Employee::getId),
                                         employee -> true,
                                         "Second error"
                                 ),
                                 new ItemValidationRuleImpl<>(
                                         TestRule.AGE_INVALID,
                                         "age",
+                                        List.of(Employee::getId),
                                         employee -> true,
                                         "Third error"
                                 ))
