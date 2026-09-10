@@ -7,7 +7,11 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -15,18 +19,22 @@ import java.util.function.Predicate;
  * validation of an entire item.
  * <p>
  * An {@code ItemValidationRuleImpl} associates a {@link RuleIdentifier} with
- * a {@link Predicate} and a human-readable validation message. The predicate
- * is evaluated against the complete item being validated.
+ * a {@link Predicate}, a field name, rejected-value getter functions, and a
+ * human-readable validation message. The predicate is evaluated against the
+ * complete item being validated.
  *
  * <p>The predicate follows a failure-oriented convention: when it evaluates
  * to {@code true}, the item is considered to violate the validation rule and
  * an {@link Error} is produced. When it evaluates to {@code false}, the item
  * passes the rule and no validation error is produced.
  *
- * <p>The resulting {@link Error} identifies the validation target as
- * {@code fieldName}, because the rule applies to the complete item rather than
- * to a specific field. The rejected value is the item that failed
- * validation.
+ * <p>The resulting {@link Error} identifies the validation target using
+ * {@code fieldName}. The rejected value(s) are obtained by applying the
+ * configured {@link #gettersForRejectedValue} functions to the item being
+ * validated.
+ *
+ * <p>If no rejected-value getters are configured, the resulting error contains
+ * an empty list of rejected values.
  *
  * <p>This implementation represents item-level validation and therefore
  * returns {@link ValidationType#ITEM} from {@link #validationType()}.
@@ -56,6 +64,18 @@ public class ItemValidationRuleImpl<T> implements ItemValidationRule<T> {
     private final String fieldName;
 
     /**
+     * Functions used to extract the value(s) reported as rejected values.
+     * <p>
+     * Each function is applied to the item being validated when the rule fails.
+     * The values returned by these functions are collected and stored as the
+     * rejected value(s) in the resulting {@link Error}.
+     * <p>
+     * The order of the functions determines the order of the rejected values in
+     * the error.
+     */
+    private final List<Function<T, Object>> gettersForRejectedValue;
+
+    /**
      * Predicate used to validate the complete item.
      * <p>
      * The predicate follows a failure-oriented convention. It must return
@@ -83,15 +103,14 @@ public class ItemValidationRuleImpl<T> implements ItemValidationRule<T> {
     }
 
     /**
-     * Validates the supplied item using the configured predicate.
-     * <p>
-     * Because this is an item-level rule, both {@code parentObject} and
-     * {@code objectToValidate} are of type {@code T}. The complete item is
-     * evaluated by the configured {@link #predicate}.
-     *
      * <p>If the predicate returns {@code true}, an {@link Error} is created
-     * with {@code "this"} as the field, the item as the rejected value, and
-     * the configured validation message.
+     * using {@code fieldName} as the validation target. The rejected value(s)
+     * are extracted from the item using the configured
+     * {@link #gettersForRejectedValue} functions, and the configured validation
+     * message is included in the error.
+     *
+     * <p>If no rejected-value getters are configured, the error contains an empty
+     * list of rejected values.
      *
      * <p>If the predicate returns {@code false}, the item passes this rule and
      * an empty {@link Optional} is returned.
@@ -109,9 +128,13 @@ public class ItemValidationRuleImpl<T> implements ItemValidationRule<T> {
     public Optional<Error> validate(T parentObject, T objectToValidate, int index) {
         log.info("Validating rule [{}] for index [{}]", ruleIdentifier, index);
         if (predicate.test(objectToValidate)) {
+            List<Object> rejectedValues = new ArrayList<>();
+            if(Objects.nonNull(gettersForRejectedValue) && !gettersForRejectedValue.isEmpty()) {
+                gettersForRejectedValue.forEach(getter -> rejectedValues.add(getter.apply(objectToValidate)));
+            }
             Error error = new Error()
                     .setField(fieldName)
-                    .setRejectedValue(objectToValidate)
+                    .setRejectedValue(rejectedValues)
                     .setMessage(message);
             log.info("During validation of rule [{}] for index [{}], an error found [{}]",
                     ruleIdentifier, error, index);

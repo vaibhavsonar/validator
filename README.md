@@ -343,9 +343,10 @@ ItemRuleBuilder<Employee> employeeRules =
 employeeRules.check(
         ValidationRules.EMPLOYEE_INVALID,
         "id-address",
+        List.of(Employee::getId, Employee::getAddress),
         employee -> employee.getId() == null
-                || employee.getId().isBlank()
-                || employee.getAddress() == null,
+            || employee.getId().isBlank()
+            || employee.getAddress() == null,
         "Employee must have an ID and an address"
 );
 ```
@@ -355,15 +356,30 @@ The predicate receives the complete `Employee`.
 ```text
 Employee
    │
-   ▼
-Predicate<Employee>
+   ├── predicate
+   │      │
+   │      ├── false → valid
+   │      │
+   │      └── true
    │
-   ├── false → valid
-   │
-   └── true  → Error
+   └── gettersForRejectedValue
+          │
+          ▼
+      rejected value(s)
+          │
+          ▼
+         Error
 ```
 
-For item-level validation, the generated error uses `"this"` as the field because the rule applies to the complete item.
+For item-level validation, the configured `fieldName` identifies the validation target.
+The `gettersForRejectedValue` functions determine which value(s) are reported as
+the rejected value(s) in the generated error. Each getter is applied to the
+validated item when the predicate fails, and the resulting values are retained
+in the same order as the configured getters.
+
+For example, the rule above reports the employee ID and address as the rejected
+values when the item-level predicate fails. If no rejected-value getters are
+configured, the rejected-value list is empty.
 
 ---
 
@@ -390,6 +406,7 @@ ItemRuleBuilder<Employee> employeeRules =
 employeeRules.check(
         ValidationRules.EMPLOYEE_INVALID,
         "id",
+        List.of(Employee::getId),
         employee -> employee.getId() == null
                 || employee.getId().isBlank(),
         "Employee ID is required"
@@ -858,6 +875,12 @@ public class Error {
     private Object rejectedValue;
     private String message;
 }
+```
+
+For item-level rules, `rejectedValue` contains the values extracted by the
+configured `gettersForRejectedValue` functions. Multiple getters can therefore
+produce multiple rejected values, in their configured order. If no getters are
+configured, the rejected-value list is empty.
 ```
 
 Example:
