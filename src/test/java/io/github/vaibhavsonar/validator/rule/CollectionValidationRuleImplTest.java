@@ -75,7 +75,7 @@ class CollectionValidationRuleImplTest {
         Error error = result.get();
 
         assertEquals("employees", error.getField());
-        assertSame(employees, error.getRejectedValue());
+        assertSame(null, error.getRejectedValue());
         assertEquals(
                 "Employee collection is invalid",
                 error.getMessage()
@@ -142,7 +142,7 @@ class CollectionValidationRuleImplTest {
         );
 
         assertSame(
-                employees,
+                null,
                 result.get().getRejectedValue()
         );
     }

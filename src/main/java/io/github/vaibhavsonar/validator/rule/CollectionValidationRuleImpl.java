@@ -155,10 +155,9 @@ public class CollectionValidationRuleImpl<T> implements CollectionValidationRule
         if (predicate.test(objectToValidate)) {
             Error error = new Error()
                     .setField(fieldName)
-                    .setRejectedValue(objectToValidate)
                     .setMessage(message);
             log.info("During validation of rule [{}] for index [{}], an error found [{}]",
-                    ruleIdentifier, error, index);
+                    ruleIdentifier, index, error);
             return Optional.of(error);
         }
         log.info("Validated rule [{}] for index [{}]", ruleIdentifier, index);
